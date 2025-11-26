@@ -9,7 +9,7 @@ Stack: React + Vite + Node Express + Spoonacular API.
 
 - [x] Setup Project Tooling (TypeScript, ESLint, Prettier)
 - [x] Create React Frontend Scaffold
-- [ ] Build Ingredient Input Component (Tag based)
-- [ ] Build Recipe Card Component
-- [ ] Connect Frontend to Backend API
-- [ ] Polish UI (Loading States, Error Handling)
+- [x] Build Ingredient Input Component (Tag based)
+- [x] Build Recipe Card Component
+- [x] Connect Frontend to Backend API
+- [x] Polish UI (Loading States, Error Handling)
