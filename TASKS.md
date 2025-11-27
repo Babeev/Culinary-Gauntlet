@@ -16,3 +16,4 @@ Stack: React + Vite + Node Express + Spoonacular API.
 - [x] Fix the sorting to show the less missing number of ingridients first
 - [x] Implement, if possible, the view of the receipe to not navigate out of our application
 - [x] Implement saving the recipe to the left section with saved cards
+- [x] Let's explore the options of passing a visual input, for example, an image and to ask LLM to retrieve the list of ingridients out of the image. 

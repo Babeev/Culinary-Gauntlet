@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import multer from 'multer';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -12,12 +14,87 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Allows your React app to talk to this server
 app.use(express.json());
 
+// Request Logging Middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Multer for handling file uploads (in memory)
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Gemini Client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
 // --- ROUTES ---
 
-// Health check (To verify server is running)
+// Health check
 app.get('/', (req: Request, res: Response) => {
   res.send('Iron Chef Server is Online 👨‍🍳');
 });
+
+// Image to Ingredients
+app.post(
+  '/api/ingredients/image',
+  upload.single('image'),
+  async (req: Request, res: Response): Promise<void> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const file = (req as any).file;
+
+    if (!file) {
+      res.status(400).json({ error: 'No image file provided' });
+      return;
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      res.status(500).json({ error: 'Gemini API Key not configured' });
+      return;
+    }
+
+    try {
+      // Initialize model
+      // Using specific version from user's available model list
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-001' });
+
+      const prompt =
+        'Identify the food ingredients in this image. Return ONLY a comma-separated list of ingredients in English (e.g. "chicken, tomato, onion"). Do not include quantities or explanations.';
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            data: file.buffer.toString('base64'),
+            mimeType: file.mimetype,
+          },
+        },
+      ]);
+
+      const response = await result.response;
+      const text = response.text();
+
+      // Clean up the text (remove newlines, extra spaces)
+      const ingredients = text
+        .replace(/\n/g, '')
+        .split(',')
+        .map((i) => i.trim())
+        .filter((i) => i.length > 0);
+
+      res.json({ ingredients });
+    } catch (error) {
+      console.error('Gemini API Error Details:', JSON.stringify(error, null, 2));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const status = (error as any).status || 500;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const message = (error as any).message || 'Failed to analyze image';
+      
+      res.status(status).json({ 
+        error: 'Failed to analyze image', 
+        details: message,
+        googleStatus: status 
+      });
+    }
+  }
+);
 
 // The Main Event: Search by Ingredients
 app.get('/api/recipes', async (req: Request, res: Response) => {
