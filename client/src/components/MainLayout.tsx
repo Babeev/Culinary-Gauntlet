@@ -1,7 +1,7 @@
 import { AppShell, Burger, Group, Title, Stack, NavLink, Text, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { IconHome, IconChartBar, IconBookmark } from '@tabler/icons-react';
+import { IconHome, IconChartBar, IconBookmark, IconList } from '@tabler/icons-react';
 import { RecipeDetail } from './RecipeModal';
 
 interface MainLayoutProps {
@@ -46,6 +46,14 @@ export function MainLayout({ savedRecipes }: MainLayoutProps) {
             component={Link}
             to="/journal"
             active={location.pathname === '/journal'}
+            onClick={() => opened && toggle()}
+          />
+          <NavLink
+            label="Admin"
+            leftSection={<IconList size={20} />}
+            component={Link}
+            to="/admin"
+            active={location.pathname === '/admin'}
             onClick={() => opened && toggle()}
           />
         </Stack>
