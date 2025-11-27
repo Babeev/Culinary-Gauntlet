@@ -14,6 +14,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { IngredientInput } from './components/IngredientInput';
 import { RecipeGrid } from './components/RecipeGrid';
 import { RecipeModal, RecipeDetail } from './components/RecipeModal';
+import { PremiumModal } from './components/PremiumModal';
+import { AdminPage } from './components/AdminPage';
 import { Recipe } from './components/RecipeCard';
 import { useState, useEffect } from 'react';
 import { IconAlertCircle, IconBookmark } from '@tabler/icons-react';
@@ -26,10 +28,23 @@ function App() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal State
+  // Simple Routing
+  const isAdmin = window.location.pathname === '/admin';
+
+  // Modal States
   const [modalOpened, { open: openModal, close: closeModal }] =
     useDisclosure(false);
+  const [
+    premiumModalOpened,
+    { open: openPremiumModal, close: closePremiumModal },
+  ] = useDisclosure(false);
+
   const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
+
+  // Premium Status
+  const [isPremium, setIsPremium] = useState<boolean>(() => {
+    return localStorage.getItem('isPremium') === 'true';
+  });
 
   // Saved Recipes State
   const [savedRecipes, setSavedRecipes] = useState<RecipeDetail[]>(() => {
@@ -89,6 +104,31 @@ function App() {
     return savedRecipes.some((r) => r.id === id);
   };
 
+  const handlePremiumAction = () => {
+    if (isPremium) {
+      return true;
+    } else {
+      openPremiumModal();
+      return false;
+    }
+  };
+
+  const handleUnlock = (email: string) => {
+    console.log('User unlocked premium with email:', email);
+    localStorage.setItem('isPremium', 'true');
+    setIsPremium(true);
+  };
+
+  if (isAdmin) {
+    return (
+      <AppShell padding="md">
+        <AppShell.Main>
+          <AdminPage />
+        </AppShell.Main>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -140,7 +180,12 @@ function App() {
               </Text>
             </Stack>
 
-            <IngredientInput onSearch={handleSearch} loading={loading} />
+            <IngredientInput
+              onSearch={handleSearch}
+              loading={loading}
+              onPremiumCheck={handlePremiumAction}
+              isPremium={isPremium}
+            />
 
             {error && (
               <Alert
@@ -170,6 +215,12 @@ function App() {
           recipeId={selectedRecipeId}
           onToggleSave={toggleSaveRecipe}
           isSaved={selectedRecipeId ? isRecipeSaved(selectedRecipeId) : false}
+        />
+
+        <PremiumModal
+          opened={premiumModalOpened}
+          onClose={closePremiumModal}
+          onUnlock={handleUnlock}
         />
       </AppShell.Main>
     </AppShell>

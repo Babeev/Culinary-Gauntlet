@@ -17,3 +17,5 @@ Stack: React + Vite + Node Express + Spoonacular API.
 - [x] Implement, if possible, the view of the receipe to not navigate out of our application
 - [x] Implement saving the recipe to the left section with saved cards
 - [x] Let's explore the options of passing a visual input, for example, an image and to ask LLM to retrieve the list of ingridients out of the image. 
+- [x] Implement the Paywall / Email Collection feature for the Image Recognition capability 
+- [x] There is a need to collect the email to the actual place to test the MVP from the marketing standpoint

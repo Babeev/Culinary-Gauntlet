@@ -1,14 +1,29 @@
 import { useState } from 'react';
-import { TagsInput, Button, Stack, Group, FileButton, Loader } from '@mantine/core';
-import { IconSearch, IconCarrot, IconCamera } from '@tabler/icons-react';
+import {
+  TagsInput,
+  Button,
+  Stack,
+  Group,
+  FileButton,
+  Loader,
+  Tooltip,
+} from '@mantine/core';
+import { IconSearch, IconCarrot, IconCamera, IconLock } from '@tabler/icons-react';
 import { API_URL } from '../config';
 
 interface IngredientInputProps {
   onSearch: (ingredients: string[]) => void;
   loading?: boolean;
+  onPremiumCheck: () => boolean;
+  isPremium: boolean;
 }
 
-export function IngredientInput({ onSearch, loading }: IngredientInputProps) {
+export function IngredientInput({
+  onSearch,
+  loading,
+  onPremiumCheck,
+  isPremium,
+}: IngredientInputProps) {
   const [value, setValue] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
 
@@ -19,6 +34,12 @@ export function IngredientInput({ onSearch, loading }: IngredientInputProps) {
   };
 
   const handleImageUpload = async (file: File | null) => {
+    // Check if premium is unlocked
+    if (!onPremiumCheck()) {
+      // If not premium, the modal will open via the callback, so we stop here.
+      return;
+    }
+
     if (!file) return;
 
     setAnalyzing(true);
@@ -60,19 +81,41 @@ export function IngredientInput({ onSearch, loading }: IngredientInputProps) {
         maxTags={20}
       />
       <Group justify="space-between">
-        <FileButton onChange={handleImageUpload} accept="image/png,image/jpeg,image/heic,image/heif">
-          {(props) => (
+        {/* 
+            If NOT premium, we wrap the button in a plain onClick handler instead of FileButton 
+            because FileButton opens the system dialog immediately.
+        */}
+        {!isPremium ? (
+          <Tooltip label="Unlock AI Features" withArrow>
             <Button
-              {...props}
               variant="light"
-              color="teal"
-              leftSection={analyzing ? <Loader size="xs" /> : <IconCamera size={20} />}
-              disabled={analyzing || loading}
+              color="indigo"
+              leftSection={<IconLock size={20} />}
+              onClick={() => onPremiumCheck()}
             >
-              {analyzing ? 'Analyzing...' : 'Snap Fridge'}
+              Snap Fridge
             </Button>
-          )}
-        </FileButton>
+          </Tooltip>
+        ) : (
+          <FileButton
+            onChange={handleImageUpload}
+            accept="image/png,image/jpeg,image/heic,image/heif"
+          >
+            {(props) => (
+              <Button
+                {...props}
+                variant="light"
+                color="teal"
+                leftSection={
+                  analyzing ? <Loader size="xs" /> : <IconCamera size={20} />
+                }
+                disabled={analyzing || loading}
+              >
+                {analyzing ? 'Analyzing...' : 'Snap Fridge'}
+              </Button>
+            )}
+          </FileButton>
+        )}
 
         <Button
           leftSection={<IconSearch size={20} />}
