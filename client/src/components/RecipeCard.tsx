@@ -45,7 +45,7 @@ export function RecipeCard({ recipe, onClick }: RecipeCardProps) {
         variant="light"
         color="blue"
         fullWidth
-        mt="md"
+        mt="auto"
         radius="md"
         onClick={onClick}
       >
