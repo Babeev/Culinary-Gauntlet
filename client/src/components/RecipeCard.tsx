@@ -10,9 +10,10 @@ export interface Recipe {
 
 interface RecipeCardProps {
   recipe: Recipe;
+  onClick: () => void;
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export function RecipeCard({ recipe, onClick }: RecipeCardProps) {
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
@@ -28,7 +29,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         <Text fw={500} truncate="end">
           {recipe.title}
         </Text>
-        
+
         <Group gap="xs">
           <Badge color="pink" variant="light">
             Missing: {recipe.missedIngredientCount}
@@ -46,13 +47,10 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         fullWidth
         mt="md"
         radius="md"
-        component="a"
-        href={`https://spoonacular.com/recipes/${recipe.title.replace(/ /g, '-')}-${recipe.id}`}
-        target="_blank"
+        onClick={onClick}
       >
         View Recipe
       </Button>
     </Card>
   );
 }
-

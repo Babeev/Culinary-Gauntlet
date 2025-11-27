@@ -62,6 +62,27 @@ app.get('/api/recipes', async (req: Request, res: Response) => {
   }
 });
 
+// Get Recipe Details
+app.get('/api/recipes/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const response = await axios.get(
+      `https://api.spoonacular.com/recipes/${id}/information`,
+      {
+        params: {
+          apiKey: process.env.SPOONACULAR_API_KEY,
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error('API Error (Details):', (error as Error).message);
+    // Fallback for details could be added here if needed, but for now error out
+    res.status(500).json({ error: 'Failed to fetch recipe details' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
