@@ -11,7 +11,7 @@ import {
   Button,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { IconBookmark, IconBookmarkFilled } from '@tabler/icons-react';
+import { IconBookmark, IconBookmarkFilled, IconChefHat } from '@tabler/icons-react';
 import { API_URL } from '../config';
 
 export interface RecipeDetail {
@@ -34,6 +34,7 @@ interface RecipeModalProps {
   onClose: () => void;
   onToggleSave: (recipe: RecipeDetail) => void;
   isSaved: boolean;
+  onCook: (recipe: RecipeDetail) => void;
 }
 
 export function RecipeModal({
@@ -42,6 +43,7 @@ export function RecipeModal({
   onClose,
   onToggleSave,
   isSaved,
+  onCook,
 }: RecipeModalProps) {
   const [recipe, setRecipe] = useState<RecipeDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -97,20 +99,30 @@ export function RecipeModal({
               <Badge color="blue">Ready in {recipe.readyInMinutes} mins</Badge>
               <Badge color="green">Servings: {recipe.servings}</Badge>
             </Group>
-            <Button
-              variant={isSaved ? 'filled' : 'light'}
-              color={isSaved ? 'yellow' : 'gray'}
-              leftSection={
-                isSaved ? (
-                  <IconBookmarkFilled size={20} />
-                ) : (
-                  <IconBookmark size={20} />
-                )
-              }
-              onClick={() => onToggleSave(recipe)}
-            >
-              {isSaved ? 'Saved' : 'Save Recipe'}
-            </Button>
+            <Group>
+              <Button
+                variant="filled"
+                color="orange"
+                leftSection={<IconChefHat size={20} />}
+                onClick={() => onCook(recipe)}
+              >
+                I Cooked This!
+              </Button>
+              <Button
+                variant={isSaved ? 'filled' : 'light'}
+                color={isSaved ? 'yellow' : 'gray'}
+                leftSection={
+                  isSaved ? (
+                    <IconBookmarkFilled size={20} />
+                  ) : (
+                    <IconBookmark size={20} />
+                  )
+                }
+                onClick={() => onToggleSave(recipe)}
+              >
+                {isSaved ? 'Saved' : 'Save Recipe'}
+              </Button>
+            </Group>
           </Group>
 
           <Title order={4} mb="xs">
