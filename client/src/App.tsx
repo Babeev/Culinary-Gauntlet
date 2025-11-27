@@ -29,7 +29,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Simple Routing
-  const isAdmin = window.location.pathname === '/admin';
+  const isAdmin = JSON.parse(new URLSearchParams(window.location.search).get('admin') || 'false');
 
   // Modal States
   const [modalOpened, { open: openModal, close: closeModal }] =
